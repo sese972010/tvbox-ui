@@ -1,0 +1,5 @@
+{
+  "name": "Copy of TVBox Hub",
+  "description": "A modern management dashboard for your TVBox subscription sources, deployed on Cloudflare Workers with KV storage.",
+  "requestFramePermissions": []
+}
