@@ -16,11 +16,20 @@ export const SourceList: React.FC<SourceListProps> = ({ sources, onDelete, onTog
         <div className="mx-auto w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 text-gray-500">
             <ICONS.Tv className="w-8 h-8"/>
         </div>
-        <h3 className="text-lg font-medium text-gray-300">No sources configured</h3>
-        <p className="text-gray-500 mt-2">Add your first subscription URL to get started.</p>
+        <h3 className="text-lg font-medium text-gray-300">暂无订阅源</h3>
+        <p className="text-gray-500 mt-2">点击右上角“添加”按钮配置您的第一个接口。</p>
       </div>
     );
   }
+
+  const getTypeLabel = (type: string) => {
+      switch(type) {
+          case 'mixed': return '混合';
+          case 'spider': return '爬虫';
+          case 'live': return '直播';
+          default: return type;
+      }
+  };
 
   return (
     <div className="grid grid-cols-1 gap-4">
@@ -44,7 +53,7 @@ export const SourceList: React.FC<SourceListProps> = ({ sources, onDelete, onTog
                   {source.name}
                 </h4>
                 <span className="text-xs px-2 py-0.5 rounded-full bg-white/10 text-gray-400 uppercase tracking-wider">
-                  {source.type}
+                  {getTypeLabel(source.type)}
                 </span>
               </div>
               <p className="text-gray-500 text-sm font-mono mt-1 truncate max-w-xs sm:max-w-md">
@@ -61,7 +70,7 @@ export const SourceList: React.FC<SourceListProps> = ({ sources, onDelete, onTog
                     ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' 
                     : 'bg-white/5 text-gray-400 hover:bg-white/10'
                 }`}
-                title={source.enabled ? "Disable" : "Enable"}
+                title={source.enabled ? "禁用" : "启用"}
             >
                 {source.enabled ? <ICONS.Check className="w-5 h-5" /> : <div className="w-5 h-5 flex items-center justify-center"><div className="w-3 h-3 rounded-full border-2 border-current"></div></div>}
             </button>
@@ -69,7 +78,7 @@ export const SourceList: React.FC<SourceListProps> = ({ sources, onDelete, onTog
             <button
                 onClick={() => onEdit(source)}
                 className="p-2 rounded-lg bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
-                title="Edit"
+                title="编辑"
             >
                 <ICONS.Edit className="w-5 h-5" />
             </button>
@@ -77,7 +86,7 @@ export const SourceList: React.FC<SourceListProps> = ({ sources, onDelete, onTog
             <button
                 onClick={() => onDelete(source.id)}
                 className="p-2 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
-                title="Delete"
+                title="删除"
             >
                 <ICONS.Trash className="w-5 h-5" />
             </button>

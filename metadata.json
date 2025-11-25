@@ -1,5 +1,5 @@
 {
-  "name": "Copy of TVBox Hub",
-  "description": "A modern management dashboard for your TVBox subscription sources, deployed on Cloudflare Workers with KV storage.",
+  "name": "TVBox 订阅管理",
+  "description": "部署在 Cloudflare Workers 上的现代化 TVBox 订阅源管理面板。",
   "requestFramePermissions": []
 }

@@ -22,9 +22,7 @@ function App() {
   const [subscribeUrl, setSubscribeUrl] = useState('');
   const [notification, setNotification] = useState<{msg: string, type: 'success' | 'error'} | null>(null);
 
-  // Derive the subscription URL (assumes worker runs on same domain)
   useEffect(() => {
-    // In dev, this might be localhost, in prod, it's the worker domain
     const origin = window.location.origin;
     setSubscribeUrl(`${origin}/subscribe`);
   }, []);
@@ -37,8 +35,6 @@ function App() {
   const fetchConfig = useCallback(async (token: string) => {
     setLoading(true);
     try {
-      // NOTE: In a real Cloudflare Worker setup, the frontend might be static HTML served by the worker,
-      // or hosted separately. We assume the API path is relative.
       const res = await fetch(`${API_BASE_URL}/config`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -46,8 +42,17 @@ function App() {
       if (res.status === 401) {
         setAuthToken(null);
         localStorage.removeItem('tvbox_auth');
-        showNotification('Session expired or invalid key', 'error');
+        showNotification('访问密钥已失效或错误', 'error');
         return;
+      }
+      
+      // Handle KV not bound error from backend
+      if (res.status === 500) {
+        const errData = await res.json().catch(() => ({}));
+        if (errData.error && errData.error.includes("KV not bound")) {
+             showNotification('系统错误：KV 数据库未绑定 (请去 Cloudflare 设置)', 'error');
+             return;
+        }
       }
 
       if (!res.ok) throw new Error('Failed to fetch');
@@ -56,8 +61,7 @@ function App() {
       setConfig(data);
     } catch (err) {
       console.error(err);
-      showNotification('Could not load configuration. Is the Worker running?', 'error');
-      // For Demo purposes if API fails, we don't crash, just show empty
+      showNotification('无法加载配置，请检查网络或后端状态', 'error');
     } finally {
       setLoading(false);
     }
@@ -98,7 +102,7 @@ function App() {
   };
 
   const handleDeleteSource = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this source?")) return;
+    if (!window.confirm("确定要删除这个订阅源吗？")) return;
     const newSources = config.sources.filter(s => s.id !== id);
     await saveConfig({ ...config, sources: newSources });
   };
@@ -122,16 +126,15 @@ function App() {
             body: JSON.stringify(newConfig)
         });
         if (!res.ok) throw new Error('Save failed');
-        showNotification('Configuration saved successfully', 'success');
+        showNotification('配置已保存', 'success');
     } catch (err) {
-        showNotification('Failed to save to cloud', 'error');
-        // Revert? (In a real app, yes)
+        showNotification('保存失败，请重试', 'error');
     }
   };
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(subscribeUrl);
-    showNotification('Subscription URL copied!', 'success');
+    showNotification('订阅地址已复制！', 'success');
   };
 
   if (!authToken) {
@@ -147,7 +150,7 @@ function App() {
                 <div className="bg-primary/20 p-2 rounded-lg text-primary">
                     <ICONS.Tv className="w-6 h-6"/>
                 </div>
-                <h1 className="text-xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">TVBox Hub</h1>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">TVBox 订阅管理</h1>
             </div>
             
             <button 
@@ -157,7 +160,7 @@ function App() {
                 }}
                 className="text-sm text-gray-500 hover:text-white transition-colors"
             >
-                Logout
+                退出登录
             </button>
         </div>
       </header>
@@ -171,7 +174,7 @@ function App() {
             
             <h2 className="text-lg font-medium text-gray-300 mb-4 flex items-center gap-2">
                 <ICONS.Link className="w-5 h-5 text-primary"/>
-                Your Subscription Link
+                您的专属订阅地址
             </h2>
             
             <div className="flex flex-col sm:flex-row gap-3">
@@ -183,17 +186,17 @@ function App() {
                     className="bg-white/10 hover:bg-white/20 text-white font-medium px-6 py-3 rounded-lg transition-colors flex items-center justify-center gap-2 shrink-0"
                 >
                     <ICONS.Copy className="w-5 h-5" />
-                    Copy
+                    复制地址
                 </button>
             </div>
             <p className="text-xs text-gray-500 mt-3 ml-1">
-                Use this URL in your TVBox network settings. Updates here are reflected automatically.
+                将此地址配置到您的 TVBox 中，此处更新将自动同步到所有设备。
             </p>
         </div>
 
         {/* Action Bar */}
         <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-white">Sources</h2>
+            <h2 className="text-2xl font-bold text-white">订阅源列表</h2>
             <button
                 onClick={() => {
                     setEditingSource(null);
@@ -202,7 +205,7 @@ function App() {
                 className="bg-primary hover:bg-indigo-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all shadow-lg shadow-primary/20 active:scale-95"
             >
                 <ICONS.Plus className="w-5 h-5" />
-                Add Source
+                添加订阅
             </button>
         </div>
 

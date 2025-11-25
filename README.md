@@ -1,5 +1,5 @@
 
-# TVBox Hub - 懒人部署指南 (Cloudflare Pages)
+# TVBox 订阅管理 (TVBox Hub)
 
 这是一个无需购买服务器、无需懂代码，完全免费部署在 Cloudflare 上的 TVBox 订阅管理后台。
 
@@ -38,7 +38,7 @@ git push -u origin main
 2. 点击左侧菜单 **"Workers & Pages"**。
 3. 点击蓝色按钮 **"Create" (创建)**。
 4. 点击标签页 **"Pages"** -> 点击 **"Connect to Git" (连接到 Git)**。
-5. 选择你刚才上传的 `tvbox-hub` 仓库，点击 **"Begin setup" (开始设置)**。
+5. 选择你刚才上传的仓库，点击 **"Begin setup" (开始设置)**。
 
 ## 第三步：配置构建环境 (最关键的一步！！！)
 在 "Set up build and deployments" 页面，请严格按照以下填写：
@@ -64,7 +64,9 @@ git push -u origin main
 2. 点击右上角 **"Create a Namespace"**。
 3. 名字输入 `TVBOX_KV` (建议全大写)，点击 **Add**。
 
-## 第五步：绑定数据库到项目
+## 第五步：绑定数据库到项目 (解决 1101 错误的关键)
+**如果打开网站提示 "KV 数据库未绑定" 或 1101 错误，就是这一步没做！**
+
 1. 回到 **"Workers & Pages"** -> 点击你刚才创建的项目 (`my-tvbox`)。
 2. 点击顶部标签栏的 **"Settings" (设置)**。
 3. 点击左侧菜单的 **"Functions" (函数)** (注意：是 Functions，不是 Environment variables)。
@@ -87,11 +89,8 @@ git push -u origin main
 1. **构建失败 "Unknown character"**: 
    这是配置文件编码问题，本项目已修复。请确保你推送了最新代码。
 
-2. **构建失败 "Could not resolve"**:
-   这是因为之前的版本缺了配置文件，本项目已修复。请确保你推送了最新代码。
-
-3. **网站打开 404**:
+2. **网站打开 404**:
    请检查第三步中，Output directory 是否填写的 `dist`。
 
-4. **无法保存数据**:
-   请检查 KV 是否绑定正确（第五步），并且绑定后是否执行了"重试部署"（第六步）。
+3. **提示 "KV 数据库未绑定" 或 1101 错误**:
+   请严格按照 **第五步** 检查绑定，并执行 **第六步** 重新部署。绑定后必须重新部署才会生效。

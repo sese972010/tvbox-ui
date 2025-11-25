@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ICONS } from '../constants';
 
 interface AuthGuardProps {
@@ -10,20 +10,17 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ onAuthenticated }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // In a real app, you might want to validate against the worker first
-  // For this UI, we just simulate a login flow which stores the token for requests
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
-    // Simulate network delay or basic validation check could go here
-    // Currently we just pass the password as a Bearer token to be validated by the API later
+    // 简单模拟验证延迟
     setTimeout(() => {
         if (password.length > 0) {
             onAuthenticated(password);
         } else {
-            setError('Please enter a valid security key');
+            setError('请输入有效的访问密钥');
             setLoading(false);
         }
     }, 500);
@@ -35,20 +32,20 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ onAuthenticated }) => {
         <div className="flex justify-center mb-6 text-primary">
             <ICONS.Lock className="w-12 h-12" />
         </div>
-        <h2 className="text-2xl font-bold text-center text-white mb-2">Access Dashboard</h2>
-        <p className="text-gray-400 text-center mb-8">Enter your deployment security key to manage subscriptions.</p>
+        <h2 className="text-2xl font-bold text-center text-white mb-2">管理后台</h2>
+        <p className="text-gray-400 text-center mb-8">请输入部署时设置的密钥以管理订阅。</p>
         
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Security Key
+              访问密钥 (Security Key)
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-              placeholder="••••••••"
+              placeholder="请输入密码..."
             />
           </div>
 
@@ -66,7 +63,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ onAuthenticated }) => {
             {loading ? (
                 <ICONS.Refresh className="animate-spin mr-2" />
             ) : (
-                "Unlock"
+                "进入管理"
             )}
           </button>
         </form>
